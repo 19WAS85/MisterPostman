@@ -1,0 +1,9 @@
+h1. Mister Postman
+
+ASP.NET AJAX in the right way!
+
+h2. How!?
+
+This is a ASP.NET module that automatizes all UpdatePanels to work with Conditional UpdateMode, updating the HTML content just when a control is modified.
+
+More information comming soon...
