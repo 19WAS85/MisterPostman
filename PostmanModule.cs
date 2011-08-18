@@ -15,6 +15,7 @@ namespace MisterPostman
         {
             application.PreRequestHandlerExecute += new EventHandler(application_PreRequestHandlerExecute);
         }
+
         void application_PreRequestHandlerExecute(object sender, EventArgs e)
         {
             // If request is to a page, creates a Postman activator.

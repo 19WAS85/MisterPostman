@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Diagnostics;
 
 namespace MisterPostman
 {
@@ -12,6 +14,7 @@ namespace MisterPostman
         private Page _page;
         private Control[] _controls;
         private PostmanObserver[] _observers;
+        private Stopwatch _stopwatch;
 
         /// <summary>
         /// Creates a activator to a page.
@@ -22,11 +25,15 @@ namespace MisterPostman
 
             // Handles page events to check changed controls.
             _page.Load += new EventHandler(page_Load);
-            _page.PreRenderComplete += new EventHandler(page_PreRenderComplete);
+            _page.SaveStateComplete += new EventHandler(page_SaveStateComplete);
+
+            _stopwatch = new Stopwatch();
         }
 
         void page_Load(object sender, EventArgs e)
         {
+            _stopwatch.Start();
+
             // Gets all page controls (ignores literals).
             _controls = FlattenHierachy(_page);
             _observers = new PostmanObserver[_controls.Length];
@@ -45,10 +52,14 @@ namespace MisterPostman
                 _observers[i] = new PostmanObserver(_controls[i]);
                 _observers[i].TakeChecksum();
             }
+
+            _stopwatch.Stop();
         }
 
-        void page_PreRenderComplete(object sender, EventArgs e)
+        void page_SaveStateComplete(object sender, EventArgs e)
         {
+            _stopwatch.Start();
+
             foreach (var o in _observers)
             {
                 // Takes the last checksum.
@@ -62,6 +73,8 @@ namespace MisterPostman
                     if (updatePanel != null) updatePanel.Update();
                 }
             }
+
+            _stopwatch.Stop();
         }
 
         /// <summary>
@@ -76,7 +89,7 @@ namespace MisterPostman
         }
 
         /// <summary>
-        /// Get all page controls, recursively, ignoring literals.
+        /// Get all page controls, recursively, ignoring literals and DataBoundControls.
         /// </summary>
         private Control[] FlattenHierachy(Control root)
         {
@@ -86,11 +99,19 @@ namespace MisterPostman
             {
                 foreach (Control c in root.Controls)
                 {
-                    if(!(c is LiteralControl)) list.AddRange(FlattenHierachy(c));
+                    if (!IgnoreChildren(root)) list.AddRange(FlattenHierachy(c));
                 }
             }
 
             return list.ToArray();
+        }
+
+        /// <summary>
+        /// Verifies if FlattenHierachy goes to ignore the children of this control.
+        /// </summary>
+        private bool IgnoreChildren(Control root)
+        {
+            return root is LiteralControl || root is BaseDataBoundControl;
         }
     }
 }
