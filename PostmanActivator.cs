@@ -89,10 +89,12 @@ namespace MisterPostman
         }
 
         /// <summary>
-        /// Get all page controls, recursively, ignoring literals and DataBoundControls.
+        /// Get all page controls, recursively, ignoring irrelevant controls.
         /// </summary>
-        private Control[] FlattenHierachy(Control root)
+        public static Control[] FlattenHierachy(Control root)
         {
+            if (IgnoreControl(root)) return new Control[0];
+
             var list = new List<Control>() { root };
 
             if (root.HasControls())
@@ -107,11 +109,19 @@ namespace MisterPostman
         }
 
         /// <summary>
+        /// Verifies if FlattenHierachy goes to ignore this control.
+        /// </summary>
+        private static bool IgnoreControl(Control root)
+        {
+            return root is LiteralControl;
+        }
+
+        /// <summary>
         /// Verifies if FlattenHierachy goes to ignore the children of this control.
         /// </summary>
-        private bool IgnoreChildren(Control root)
+        private static bool IgnoreChildren(Control root)
         {
-            return root is LiteralControl || root is BaseDataBoundControl;
+            return root is BaseDataBoundControl;
         }
     }
 }
