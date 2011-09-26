@@ -101,7 +101,7 @@ namespace MisterPostman
             {
                 foreach (Control c in root.Controls)
                 {
-                    if (!IgnoreChildren(root)) list.AddRange(FlattenHierachy(c));
+                    list.AddRange(FlattenHierachy(c));
                 }
             }
 
@@ -114,14 +114,6 @@ namespace MisterPostman
         private static bool IgnoreControl(Control root)
         {
             return root is LiteralControl;
-        }
-
-        /// <summary>
-        /// Verifies if FlattenHierachy goes to ignore the children of this control.
-        /// </summary>
-        private static bool IgnoreChildren(Control root)
-        {
-            return root is BaseDataBoundControl;
         }
     }
 }
